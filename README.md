@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CS2 Lineups
 
-## Getting Started
+Интерактивная база лайнапов гранат для Counter-Strike 2. Дымы, флэшки, молотовы и HE для всех карт. Авторизация через Discord/Google, комментарии, загрузка медиа.
 
-First, run the development server:
+## Стек
+
+- **Next.js 16** + React 19 + TypeScript
+- **Tailwind CSS 4** — стили
+- **Framer Motion** — анимации
+- **React-Leaflet** — интерактивные карты
+- **Supabase** — PostgreSQL + Auth + Storage
+- **Netlify** — деплой
+
+## Установка
+
+```bash
+git clone https://github.com/mrkiwjr/cs2-lineups.git
+cd cs2-lineups
+npm install
+cp .env.example .env.local
+```
+
+Заполнить `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...your_anon_key
+```
+
+Запуск:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Структура
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── lineups/        # CRUD лайнапов
+│   │   ├── comments/       # CRUD комментариев
+│   │   ├── favorites/      # Избранное
+│   │   ├── upload/         # Загрузка медиа
+│   │   └── views/          # Счётчик просмотров
+│   ├── auth/
+│   │   ├── callback/       # OAuth callback
+│   │   └── error/          # Ошибка авторизации
+│   ├── layout.tsx          # Root layout
+│   └── page.tsx            # Главная страница
+├── components/
+│   ├── auth/
+│   │   ├── AuthButton.tsx  # Кнопка входа + дропдаун
+│   │   └── AuthProvider.tsx # Контекст авторизации
+│   ├── comments/
+│   │   ├── CommentSection.tsx # Секция комментариев
+│   │   └── CommentItem.tsx    # Отдельный комментарий
+│   ├── detail/
+│   │   └── DetailPanel.tsx # Панель деталей лайнапа
+│   ├── layout/
+│   │   ├── Topbar.tsx      # Навигация + карты
+│   │   └── Sidebar.tsx     # Фильтры + список лайнапов
+│   └── map/
+│       ├── MapArea.tsx     # Обёртка карты (SSR-safe)
+│       └── MapInner.tsx    # Leaflet карта + маркеры
+├── hooks/
+│   ├── useLineups.ts       # Загрузка лайнапов из Supabase
+│   └── useFilters.ts       # Фильтры + hash-роутинг
+├── lib/
+│   ├── constants/
+│   │   ├── maps.ts         # 7 карт + позиции
+│   │   └── labels.ts       # Лейблы, цвета, иконки
+│   ├── supabase/
+│   │   ├── client.ts       # Браузерный клиент
+│   │   └── server.ts       # Серверный клиент
+│   ├── types/              # TypeScript типы
+│   └── utils/              # Хелперы
+└── middleware.ts            # Auth session refresh
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Основные функции
 
-## Learn More
+**Всем пользователям:**
 
-To learn more about Next.js, take a look at the following resources:
+- Просмотр 48 лайнапов на 7 картах (Mirage, Inferno, Dust 2, Nuke, Anubis, Ancient, Overpass)
+- Фильтрация по типу гранаты (дым, флэш, молотов, HE) и стороне (T/CT)
+- Интерактивная карта с маркерами + траектория броска
+- Прямые ссылки на фильтры (`#mirage/smoke/T`)
+- Детальная панель с видео, инструкцией, описанием
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Авторизованным:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Вход через Discord / Google
+- Добавление лайнапов с описанием и видео
+- Избранное
+- Комментарии (создание, редактирование, удаление)
+- Загрузка скриншотов и видео
 
-## Deploy on Vercel
+## База данных
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6 таблиц + 2 views в Supabase:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `profiles` — пользователи (auto-create при OAuth)
+- `lineups` — лайнапы с автором
+- `favorites` — связка юзер-лайнап
+- `lineup_views` — уникальные просмотры по IP
+- `comments` — комментарии с каскадным удалением
+- `map_positions` — координаты точек на картах
+- `lineup_view_count` / `lineup_favorites_count` — агрегирующие views
+
+RLS-политики: SELECT открыт для всех, INSERT/UPDATE/DELETE — только автор.
+
+## API Routes
+
+| Метод | Endpoint | Описание | Auth |
+|-------|----------|----------|------|
+| GET | `/api/lineups` | Список с фильтрами | — |
+| POST | `/api/lineups` | Создать лайнап | да |
+| PUT | `/api/lineups/[id]` | Обновить (автор) | да |
+| DELETE | `/api/lineups/[id]` | Удалить (автор) | да |
+| GET | `/api/favorites` | Мои избранные | да |
+| POST | `/api/favorites` | Добавить | да |
+| DELETE | `/api/favorites` | Убрать | да |
+| GET | `/api/comments` | Комменты к лайнапу | — |
+| POST | `/api/comments` | Написать | да |
+| PUT | `/api/comments/[id]` | Редактировать (автор) | да |
+| DELETE | `/api/comments/[id]` | Удалить (автор) | да |
+| POST | `/api/upload` | Загрузка медиа | да |
+
+## Безопасность
+
+- JWT Bearer token авторизация на всех защищённых эндпоинтах
+- Owner-check: редактировать/удалять может только автор
+- Whitelist полей при создании (защита от mass assignment)
+- Upload: только jpg/png/webp/gif/mp4, лимит 10MB
+- Open redirect защита в OAuth callback
+- Security headers: X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- RLS на всех таблицах Supabase
+- Ошибки БД не утекают клиенту
+
+## Деплой
+
+Netlify:
+
+```bash
+npm run build
+```
+
+Environment variables в Netlify Dashboard:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
