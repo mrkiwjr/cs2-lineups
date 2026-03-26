@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { MAPS } from '@/lib/constants/maps'
+import { CALLOUTS } from '@/lib/constants/callouts'
 import { colorMap } from '@/lib/constants/labels'
 import { getPos } from '@/lib/utils/leaflet-helpers'
 import type { MapSlug, LineupWithStats, GrenadeType } from '@/lib/types/lineup'
@@ -24,8 +25,10 @@ interface MapAreaProps {
 }
 
 export default function MapArea({ map, lineups, activeLineup, onLineupClick, hoveredId, onHover }: MapAreaProps) {
+  const [showCallouts, setShowCallouts] = useState(false)
   const mapData = MAPS[map]
   const imageUrl = mapData?.image
+  const callouts = CALLOUTS[map] || []
 
   const markers = useMemo(() => {
     return lineups.map((lineup) => {
@@ -46,10 +49,10 @@ export default function MapArea({ map, lineups, activeLineup, onLineupClick, hov
   if (!imageUrl) return null
 
   return (
-    <main className="flex-1 relative bg-[#0d0e14] overflow-hidden h-full">
-      {/* Map container — square aspect ratio */}
+    <main className="flex-1 relative bg-[#0d0e14] overflow-hidden" style={{ height: 'calc(100vh - 48px)' }}>
+      {/* Map container — always fits viewport */}
       <div className="relative w-full h-full flex items-center justify-center">
-        <div className="relative w-full max-h-full" style={{ aspectRatio: '1/1' }}>
+        <div className="relative" style={{ width: 'min(100%, calc(100vh - 56px))', aspectRatio: '1/1' }}>
           {/* Map image */}
           <img
             src={imageUrl}
@@ -83,6 +86,17 @@ export default function MapArea({ map, lineups, activeLineup, onLineupClick, hov
               />
             </svg>
           )}
+
+          {/* Callout labels */}
+          {showCallouts && callouts.map((callout) => (
+            <div
+              key={callout.name}
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-[9px] text-white/50 font-mono whitespace-nowrap"
+              style={{ left: `${callout.x}%`, top: `${callout.y}%` }}
+            >
+              {callout.name}
+            </div>
+          ))}
 
           {/* Markers */}
           {markers.map(({ lineup, x, y }) => {
@@ -122,6 +136,18 @@ export default function MapArea({ map, lineups, activeLineup, onLineupClick, hov
           })}
         </div>
       </div>
+
+      {/* Callouts toggle */}
+      <button
+        onClick={() => setShowCallouts((v) => !v)}
+        className={`absolute bottom-3 right-3 z-30 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+          showCallouts
+            ? 'bg-white/15 text-white border border-white/20'
+            : 'bg-[#1a1b26]/80 text-white/50 border border-[#2a2b36] hover:text-white/70'
+        }`}
+      >
+        Callouts
+      </button>
     </main>
   )
 }
