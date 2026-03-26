@@ -185,6 +185,26 @@ interface MapInnerProps {
   onLineupClick: (lineup: LineupWithStats) => void
 }
 
+/* ── Auto-invalidate size when container becomes visible ── */
+function InvalidateSizeHandler() {
+  const map = useMap()
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize()
+    })
+    if (map.getContainer()) {
+      observer.observe(map.getContainer())
+    }
+    // Also invalidate after a short delay for initial render
+    const timer = setTimeout(() => map.invalidateSize(), 100)
+    return () => {
+      observer.disconnect()
+      clearTimeout(timer)
+    }
+  }, [map])
+  return null
+}
+
 /* ── Main inner component ── */
 export default function MapInner({
   mapSlug,
@@ -216,6 +236,7 @@ export default function MapInner({
       className="w-full h-full"
       style={{ background: '#0d0e14' }}
     >
+      <InvalidateSizeHandler />
       <MapController imageUrl={imageUrl} />
 
       <ImageOverlay url={imageUrl} bounds={bounds} opacity={0.85} />

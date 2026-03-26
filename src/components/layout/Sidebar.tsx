@@ -51,6 +51,8 @@ interface SidebarProps {
   favorites: Set<number>
   onToggleFavorite: (id: number) => void
   user: User | null
+  hoveredId?: number | null
+  onHover?: (id: number | null) => void
 }
 
 /* ── Component ── */
@@ -63,6 +65,8 @@ export default function Sidebar({
   favorites,
   onToggleFavorite,
   user,
+  hoveredId,
+  onHover,
 }: SidebarProps) {
   const count = lineups.length
   const countLabel = filters.tab === 'favorites' ? 'избранных' : 'лайнапов'
@@ -215,6 +219,7 @@ export default function Sidebar({
         {lineups.map((lineup, index) => {
           const isActive = lineup.id === activeLineupId
           const isFav = favorites.has(lineup.id)
+          const isHovered = hoveredId === lineup.id
 
           return (
             <motion.div
@@ -224,11 +229,15 @@ export default function Sidebar({
               transition={{ delay: index * 0.03 }}
               whileHover={{ scale: 1.01 }}
               onClick={() => onLineupClick(lineup)}
+              onMouseEnter={() => onHover?.(lineup.id)}
+              onMouseLeave={() => onHover?.(null)}
               className={`
                 relative flex items-start gap-2 p-2 rounded-lg cursor-pointer transition-colors mb-0.5
                 ${
                   isActive
                     ? 'bg-[#2a2b36]'
+                    : isHovered
+                    ? 'bg-[#1e1f2a] ring-1 ring-[#4ea8d1]/30'
                     : 'hover:bg-[#1e1f2a]'
                 }
               `}

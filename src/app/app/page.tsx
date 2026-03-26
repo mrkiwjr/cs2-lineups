@@ -19,6 +19,7 @@ export default function Home() {
 
   const [activeLineup, setActiveLineup] = useState<LineupWithStats | null>(null)
   const [favorites, setFavorites] = useState<Set<number>>(new Set())
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
 
   // Load favorites via API when user logs in
   useEffect(() => {
@@ -185,24 +186,48 @@ export default function Home() {
             <AuthButton />
           </Topbar>
 
+          {/* Desktop: sidebar + map side by side. Mobile: only map */}
           <div className="flex flex-1 overflow-hidden">
-            <Sidebar
-              lineups={filtered}
-              filters={filters}
-              onFilterChange={setFilter}
-              onLineupClick={handleLineupClick}
-              activeLineupId={activeLineup?.id ?? null}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-              user={user}
-            />
+            {/* Sidebar — desktop only */}
+            <div className="hidden md:block w-[260px] flex-shrink-0 h-full overflow-y-auto">
+              <Sidebar
+                lineups={filtered}
+                filters={filters}
+                onFilterChange={setFilter}
+                onLineupClick={handleLineupClick}
+                activeLineupId={activeLineup?.id ?? null}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+                user={user}
+                hoveredId={hoveredId}
+                onHover={setHoveredId}
+              />
+            </div>
 
-            <MapArea
-              map={filters.map}
-              lineups={filters.tab === 'favorites' ? filtered.filter((l) => l.map === filters.map) : filtered}
-              activeLineup={activeLineup}
-              onLineupClick={handleLineupClick}
-            />
+            {/* Map + promo */}
+            <div className="flex-1 min-h-[50vh] md:min-h-0 flex flex-col">
+              <div className="flex-1">
+                <MapArea
+                  map={filters.map}
+                  lineups={filters.tab === 'favorites' ? filtered.filter((l) => l.map === filters.map) : filtered}
+                  activeLineup={activeLineup}
+                  onLineupClick={handleLineupClick}
+                  hoveredId={hoveredId}
+                  onHover={setHoveredId}
+                />
+              </div>
+
+              {/* Promo block — under map on mobile */}
+              <div className="md:hidden mx-3 my-4 p-4 rounded-xl bg-[#1a1b26] border border-[#2a2b36]">
+                <p className="text-[#c0c4d6] text-sm leading-relaxed">
+                  <span className="text-[#4ea8d1] font-bold">CS2 Lineups</span> — лучшее место для изучения раскидов гранат в Counter-Strike 2.
+                  Дымы, флэшки, молотовы и HE для всех карт.{' '}
+                  <a href="/" className="text-[#d4a843] underline">Лендинг</a>
+                  {' '}или{' '}
+                  <a href="https://discord.gg/" className="text-[#7289da] underline">Discord</a>.
+                </p>
+              </div>
+            </div>
 
             <DetailPanel
               lineup={activeLineup}

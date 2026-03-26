@@ -102,7 +102,7 @@ export default function DetailPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 420, opacity: 0 }}
       transition={{ type: "spring", damping: 28, stiffness: 300 }}
-      className="fixed right-0 top-14 w-[420px] h-[calc(100vh-56px)] bg-[#1a1b26] overflow-y-auto z-40 border-l border-[#2a2b36] shadow-2xl">
+      className="fixed right-0 top-12 md:top-14 w-full md:w-[420px] h-[calc(100vh-48px)] md:h-[calc(100vh-56px)] bg-[#1a1b26] overflow-y-auto z-40 border-l border-[#2a2b36] shadow-2xl">
       {/* Close button */}
       <button
         onClick={onClose}

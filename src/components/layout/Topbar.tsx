@@ -24,9 +24,9 @@ interface TopbarProps {
 
 export default function Topbar({ activeMap, onMapChange, children }: TopbarProps) {
   return (
-    <header className="flex items-center h-14 bg-[#13141a] border-b border-[#2a2b36] px-4 gap-3 shrink-0 z-50">
+    <header className="flex items-center h-12 md:h-14 bg-[#13141a] border-b border-[#2a2b36] px-2 md:px-4 gap-2 md:gap-3 shrink-0 z-50">
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
+      <Link href="/" className="flex items-center gap-1.5 md:gap-2 shrink-0 hover:opacity-80 transition-opacity">
         <svg
           className="text-white/80"
           width="22"
@@ -45,8 +45,8 @@ export default function Topbar({ activeMap, onMapChange, children }: TopbarProps
         </span>
       </Link>
 
-      {/* Map tabs */}
-      <nav className="flex items-center gap-1 mx-auto">
+      {/* Map tabs — scrollable on mobile */}
+      <nav className="flex items-center gap-1 mx-auto overflow-x-auto scrollbar-hide">
         {MAP_SLUGS.map((slug) => (
           <motion.button
             key={slug}

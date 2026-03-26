@@ -6,6 +6,10 @@
   --font-mono: var(--font-mono);
 }
 
+/* Hide scrollbar for mobile nav */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* Leaflet overrides for dark theme */
 .leaflet-container {
   background: #0d0e14;
