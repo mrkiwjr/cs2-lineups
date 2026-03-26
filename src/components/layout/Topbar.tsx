@@ -2,6 +2,7 @@
 
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { mapLabels } from '@/lib/constants/labels'
 import type { MapSlug } from '@/lib/types/lineup'
 
@@ -25,7 +26,7 @@ export default function Topbar({ activeMap, onMapChange, children }: TopbarProps
   return (
     <header className="flex items-center h-14 bg-[#13141a] border-b border-[#2a2b36] px-4 gap-3 shrink-0 z-50">
       {/* Logo */}
-      <div className="flex items-center gap-2 shrink-0">
+      <Link href="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
         <svg
           className="text-white/80"
           width="22"
@@ -42,7 +43,7 @@ export default function Topbar({ activeMap, onMapChange, children }: TopbarProps
         <span className="text-white/90 font-semibold text-sm tracking-wide whitespace-nowrap">
           CS2 Lineups
         </span>
-      </div>
+      </Link>
 
       {/* Map tabs */}
       <nav className="flex items-center gap-1 mx-auto">
