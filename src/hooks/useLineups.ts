@@ -6,8 +6,11 @@ import type { LineupWithStats, MapSlug, GrenadeType, Side, ThrowType } from '@/l
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
+export type PositionMap = Record<string, Record<string, { x: number; y: number }>>
+
 interface UseLineupsReturn {
   lineups: LineupWithStats[]
+  positions: PositionMap
   loading: boolean
   error: string | null
   refetch: () => void
@@ -15,6 +18,7 @@ interface UseLineupsReturn {
 
 export function useLineups(): UseLineupsReturn {
   const [lineups, setLineups] = useState<LineupWithStats[]>([])
+  const [positions, setPositions] = useState<PositionMap>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -23,21 +27,37 @@ export function useLineups(): UseLineupsReturn {
     setError(null)
 
     try {
-      console.log('[useLineups] fetching via REST...')
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/lineups?select=*&order=id.asc`,
-        {
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-          },
+      const headers = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+      }
+
+      async function fetchAll(url: string) {
+        const all: any[] = []
+        let offset = 0
+        const batchSize = 1000
+        while (true) {
+          const res = await fetch(`${url}&limit=${batchSize}&offset=${offset}`, { headers })
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          const batch = await res.json()
+          all.push(...batch)
+          if (batch.length < batchSize) break
+          offset += batchSize
         }
-      )
+        return all
+      }
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const [data, posData] = await Promise.all([
+        fetchAll(`${SUPABASE_URL}/rest/v1/lineups?select=*&order=id.asc`),
+        fetchAll(`${SUPABASE_URL}/rest/v1/map_positions?select=*`),
+      ])
 
-      const data = await res.json()
-      console.log('[useLineups] got', data.length, 'items')
+      const posMap: PositionMap = {}
+      for (const p of posData) {
+        if (!posMap[p.map]) posMap[p.map] = {}
+        posMap[p.map][p.name] = { x: p.x, y: p.y }
+      }
+      setPositions(posMap)
 
       const merged: LineupWithStats[] = data.map((lineup: any) => ({
         id: lineup.id,
@@ -75,5 +95,5 @@ export function useLineups(): UseLineupsReturn {
     fetchLineups()
   }, [fetchLineups])
 
-  return { lineups, loading, error, refetch: fetchLineups }
+  return { lineups, positions, loading, error, refetch: fetchLineups }
 }

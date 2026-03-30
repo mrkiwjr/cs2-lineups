@@ -31,7 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const supabase = createClient()
 
-    // Use a timeout to prevent hanging
     const timeout = setTimeout(() => {
       console.warn('[AuthProvider] getSession timed out')
       setLoading(false)
@@ -44,7 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccessToken(session?.access_token ?? null)
 
       if (currentUser) {
-        // Fetch profile via REST to avoid supabase client hanging
         try {
           const res = await fetch(
             `${SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUser.id}&select=id,username,avatar_url`,
@@ -79,7 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return
         }
 
-        // Fetch profile for the new session
         try {
           const res = await fetch(
             `${SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUser.id}&select=id,username,avatar_url`,

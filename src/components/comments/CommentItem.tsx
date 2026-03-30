@@ -46,7 +46,6 @@ export default function CommentItem({ comment, isOwn, onEdit, onDelete }: Commen
 
   return (
     <div className="flex gap-3 group">
-      {/* Avatar */}
       {avatar ? (
         <img
           src={avatar}
@@ -59,7 +58,6 @@ export default function CommentItem({ comment, isOwn, onEdit, onDelete }: Commen
         </div>
       )}
 
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-medium text-white/80 truncate">
@@ -74,7 +72,6 @@ export default function CommentItem({ comment, isOwn, onEdit, onDelete }: Commen
             </span>
           )}
 
-          {/* Edit / Delete buttons */}
           {isOwn && !editing && (
             <div className="flex gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
               <button

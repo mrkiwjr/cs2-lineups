@@ -1,23 +1,26 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { parsePositiveInt } from '@/lib/utils/validation'
+import { generalLimiter, checkRateLimit, getClientIP } from '@/lib/utils/rate-limit'
 
 export async function POST(request: Request) {
   try {
-    const { lineup_id } = await request.json()
-    if (!lineup_id) {
-      return NextResponse.json({ error: 'lineup_id required' }, { status: 400 })
+    const rl = await checkRateLimit(generalLimiter, getClientIP(request))
+    if (rl) return rl
+
+    const body = await request.json()
+    const lineupId = parsePositiveInt(body.lineup_id)
+    if (!lineupId) {
+      return NextResponse.json({ error: 'Valid lineup_id is required' }, { status: 400 })
     }
 
     const supabase = await createClient()
-
-    // Get viewer IP from headers
     const forwarded = request.headers.get('x-forwarded-for')
     const ip = forwarded?.split(',')[0]?.trim() || 'unknown'
 
-    // Upsert — one view per IP per lineup
     await (supabase.from('lineup_views') as any).upsert(
-      { lineup_id, viewer_ip: ip },
-      { onConflict: 'lineup_id,viewer_ip' }
+      { lineup_id: lineupId, viewer_ip: ip },
+      { onConflict: 'lineup_id,viewer_ip' },
     )
 
     return NextResponse.json({ ok: true })

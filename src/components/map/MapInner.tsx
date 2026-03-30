@@ -17,7 +17,6 @@ import { MAP_SIZE, getPos } from '@/lib/utils/leaflet-helpers'
 import { colorMap, typeLabels } from '@/lib/constants/labels'
 import type { MapSlug, LineupWithStats, GrenadeType } from '@/lib/types/lineup'
 
-/* ── Grenade SVG icons for map markers ── */
 const markerSVGs: Record<GrenadeType, string> = {
   smoke: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><path d="M12 7V4M12 20v-3M7 12H4M20 12h-3" opacity=".6"/></svg>`,
   flash: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
@@ -25,14 +24,12 @@ const markerSVGs: Record<GrenadeType, string> = {
   he: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="13" r="7"/><path d="M12 6V3M9 3h6"/></svg>`,
 }
 
-/* ── Helper: convert percentage position to Leaflet LatLng ── */
 function toLatLng(map: L.Map, pos: { x: number; y: number }): L.LatLng {
   const px = (pos.x / 100) * MAP_SIZE
   const py = (pos.y / 100) * MAP_SIZE
   return map.unproject([px, py], 0)
 }
 
-/* ── Sub-component: handle map change (re-fit bounds) ── */
 function MapController({ imageUrl }: { imageUrl: string }) {
   const map = useMap()
 
@@ -46,7 +43,6 @@ function MapController({ imageUrl }: { imageUrl: string }) {
   return null
 }
 
-/* ── Marker sub-component (needs useMap) ── */
 function LineupMarkers({
   lineups,
   activeLineup,
@@ -118,7 +114,6 @@ function LineupMarkers({
   )
 }
 
-/* ── Trajectory sub-component ── */
 function Trajectory({
   lineup,
 }: {
@@ -138,7 +133,6 @@ function Trajectory({
 
   return (
     <>
-      {/* Dashed trajectory line */}
       <Polyline
         positions={[from, to]}
         pathOptions={{
@@ -150,7 +144,6 @@ function Trajectory({
         }}
       />
 
-      {/* From dot */}
       <CircleMarker
         center={from}
         radius={5}
@@ -176,7 +169,6 @@ function Trajectory({
   )
 }
 
-/* ── Props ── */
 interface MapInnerProps {
   mapSlug: MapSlug
   imageUrl: string
@@ -185,7 +177,6 @@ interface MapInnerProps {
   onLineupClick: (lineup: LineupWithStats) => void
 }
 
-/* ── Auto-invalidate size when container becomes visible ── */
 function InvalidateSizeHandler() {
   const map = useMap()
   useEffect(() => {
@@ -195,7 +186,6 @@ function InvalidateSizeHandler() {
     if (map.getContainer()) {
       observer.observe(map.getContainer())
     }
-    // Also invalidate after a short delay for initial render
     const timer = setTimeout(() => map.invalidateSize(), 100)
     return () => {
       observer.disconnect()
@@ -205,7 +195,6 @@ function InvalidateSizeHandler() {
   return null
 }
 
-/* ── Main inner component ── */
 export default function MapInner({
   mapSlug,
   imageUrl,
@@ -213,12 +202,7 @@ export default function MapInner({
   activeLineup,
   onLineupClick,
 }: MapInnerProps) {
-  /* Calculate image bounds at zoom 0 */
   const bounds = useMemo(() => {
-    /* Use a temporary map to unproject — but we can also compute directly.
-       For CRS.Simple at zoom 0, unproject([px,py], 0) => LatLng(py, px) inverted.
-       Leaflet CRS.Simple: latlng.lat = y, latlng.lng = x (in pixel coords).
-       unproject at zoom 0 divides by 1 (2^0), so LatLng(-py, px). */
     const corner: L.LatLngTuple = [-MAP_SIZE, MAP_SIZE]
     return new L.LatLngBounds([0, 0], corner)
   }, [])

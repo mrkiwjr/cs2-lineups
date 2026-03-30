@@ -6,11 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "docker:dev": "docker compose up --build",
+    "docker:build": "docker build --target runner -t cs2-lineups .",
+    "docker:start": "docker run --rm -p 3000:3000 --env-file .env.local --name cs2-lineups-app cs2-lineups",
+    "docker:stop": "docker compose down",
+    "docker:clean": "docker compose down -v --rmi local"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.100.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "framer-motion": "^12.38.0",
     "leaflet": "^1.9.4",
     "next": "16.2.1",

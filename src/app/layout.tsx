@@ -25,6 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className={`${inter.variable} ${jetbrainsMono.variable} h-full dark`}>
+      <head>
+        <link rel="preconnect" href="https://assets.csnades.gg" />
+        <link rel="preconnect" href="https://customer-9h7e8ahl6hivmjb6.cloudflarestream.com" />
+        <link rel="dns-prefetch" href="https://assets.csnades.gg" />
+        <link rel="dns-prefetch" href="https://customer-9h7e8ahl6hivmjb6.cloudflarestream.com" />
+      </head>
       <body className="min-h-full bg-[#0d0e14] font-sans text-white antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>

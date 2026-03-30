@@ -16,7 +16,6 @@ const DEFAULT_FILTERS: LineupFilters = {
   tab: 'all',
 }
 
-/* Parse URL hash into filter state */
 function parseHash(): Partial<LineupFilters> & { lineupId?: number } {
   if (typeof window === 'undefined') return {}
 
@@ -49,7 +48,6 @@ function parseHash(): Partial<LineupFilters> & { lineupId?: number } {
   return result
 }
 
-/* Build hash from filter state */
 function buildHash(filters: LineupFilters): string {
   if (filters.tab === 'favorites') return '#favorites'
 
@@ -74,7 +72,6 @@ export function useFilters(): UseFiltersReturn {
   const [initialLineupId, setInitialLineupId] = useState<number | null>(null)
   const suppressHash = useRef(false)
 
-  /* Read hash on mount */
   useEffect(() => {
     const parsed = parseHash()
     if (parsed.lineupId) {
@@ -83,7 +80,6 @@ export function useFilters(): UseFiltersReturn {
     setFilters((prev) => ({ ...prev, ...parsed }))
   }, [])
 
-  /* Update hash when filters change */
   useEffect(() => {
     if (suppressHash.current) {
       suppressHash.current = false
@@ -95,7 +91,6 @@ export function useFilters(): UseFiltersReturn {
     }
   }, [filters])
 
-  /* Listen to hashchange (browser back/forward) */
   useEffect(() => {
     const handler = () => {
       suppressHash.current = true
@@ -120,7 +115,7 @@ export function useFilters(): UseFiltersReturn {
   )
 
   const setMap = useCallback((map: MapSlug) => {
-    setFilters((prev) => ({ ...prev, map, type: 'all', side: 'all' }))
+    setFilters((prev) => ({ ...prev, map }))
   }, [])
 
   const setTab = useCallback((tab: 'all' | 'favorites') => {

@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useRef } from 'react'
 
-// ─── Grenade SVG icons ───
 const SmokeIcon = () => (
   <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
     <circle cx="12" cy="12" r="8" stroke="#4ea8d1" strokeWidth="2" />
@@ -28,7 +27,6 @@ const HEIcon = () => (
   </svg>
 )
 
-// ─── Animated counter ───
 function Counter({ value, suffix = '' }: { value: number; suffix?: string }) {
   return (
     <motion.span
@@ -48,7 +46,6 @@ function Counter({ value, suffix = '' }: { value: number; suffix?: string }) {
   )
 }
 
-// ─── Stagger wrapper ───
 const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.1 } },
@@ -66,7 +63,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0b10] text-white overflow-x-hidden">
-      {/* ═══════ NOISE OVERLAY ═══════ */}
       <div
         className="pointer-events-none fixed inset-0 z-50 opacity-[0.03]"
         style={{
@@ -74,7 +70,6 @@ export default function LandingPage() {
         }}
       />
 
-      {/* ═══════ NAVBAR ═══════ */}
       <nav className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 backdrop-blur-xl bg-[#0a0b10]/70">
         <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
           <Link href="/landing" className="flex items-center gap-2.5 group">
@@ -102,9 +97,7 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ═══════ HERO ═══════ */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-16">
-        {/* Game screenshot background */}
         <div
           className="absolute inset-0"
           style={{
@@ -113,23 +106,19 @@ export default function LandingPage() {
             backgroundPosition: 'center 30%',
           }}
         />
-        {/* Dark overlays for readability */}
         <div className="absolute inset-0 bg-[#0a0b10]/70" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0b10] via-transparent to-[#0a0b10]" />
 
-        {/* Gradient orbs */}
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-[#4ea8d1]/8 blur-[150px]" />
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#d14e4e]/6 blur-[150px]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-[#d4a843]/5 blur-[100px]" />
 
-        {/* Grid lines */}
         <div className="absolute inset-0 opacity-[0.04]" style={{
           backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
           backgroundSize: '80px 80px',
         }} />
 
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -140,7 +129,6 @@ export default function LandingPage() {
             7 карт · 48 лайнапов · обновляется
           </motion.div>
 
-          {/* Main heading */}
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -153,7 +141,6 @@ export default function LandingPage() {
             </span>
           </motion.h1>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -165,7 +152,6 @@ export default function LandingPage() {
             <span className="text-[#c0c4d6]">Выучи — закидай — стань красавцем.</span>
           </motion.p>
 
-          {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -183,7 +169,6 @@ export default function LandingPage() {
             <span className="text-sm text-[#555] font-mono">бесплатно · без регистрации</span>
           </motion.div>
 
-          {/* Grenade icons floating */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -207,7 +192,6 @@ export default function LandingPage() {
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -224,7 +208,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* ═══════ PREVIEW ═══════ */}
       <section className="relative py-32 px-6">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#4ea8d1]/3 to-transparent" />
         <motion.div
@@ -252,7 +235,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* ═══════ FEATURES ═══════ */}
       <section className="py-32 px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -335,7 +317,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════ STATS ═══════ */}
       <section className="py-32 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#d14e4e]/3 to-transparent" />
         <div className="max-w-5xl mx-auto relative z-10">
@@ -374,7 +355,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════ HOW IT WORKS ═══════ */}
       <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -419,7 +399,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════ CTA ═══════ */}
       <section className="py-32 px-6 relative">
         <div className="absolute inset-0">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full bg-[#4ea8d1]/5 blur-[150px]" />
@@ -452,7 +431,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* ═══════ FOOTER ═══════ */}
       <footer className="border-t border-white/5 py-12 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
@@ -471,7 +449,6 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Shimmer keyframes */}
       <style jsx global>{`
         @keyframes shimmer {
           0% { background-position: -250% -250%; }

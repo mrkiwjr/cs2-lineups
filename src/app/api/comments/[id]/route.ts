@@ -1,124 +1,76 @@
 import { type NextRequest } from 'next/server'
-import {
-  getUser,
-  getToken,
-  supabaseHeaders,
-  REST_URL,
-} from '@/lib/utils/auth-helpers'
+import { getUser, getToken, supabaseHeaders, REST_URL } from '@/lib/utils/auth-helpers'
+import { safeHandler, errorResponse } from '@/lib/utils/api-response'
+import { writeLimiter, checkRateLimit } from '@/lib/utils/rate-limit'
+import { parsePositiveInt, validateCommentText } from '@/lib/utils/validation'
 
 type RouteParams = { params: Promise<{ id: string }> }
 
-/**
- * PUT /api/comments/[id]
- * Update a comment. Body: { text }. Auth required, only the author.
- */
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export const PUT = safeHandler(async (request: NextRequest, { params }: RouteParams) => {
   const { id } = await params
+  const numericId = parsePositiveInt(id)
+  if (!numericId) return errorResponse('Invalid comment ID', 400)
+
   const token = getToken(request)
   const user = await getUser(request)
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) return errorResponse('Unauthorized', 401)
+
+  const rlPut = await checkRateLimit(writeLimiter, user.id)
+  if (rlPut) return rlPut
+
+  const body = await request.json()
+  const text = validateCommentText(body.text)
+  if (!text) return errorResponse('text is required (1-2000 chars)', 400)
+
+  const res = await fetch(
+    `${REST_URL}/comments?id=eq.${numericId}&user_id=eq.${user.id}`,
+    {
+      method: 'PATCH',
+      headers: supabaseHeaders(token),
+      body: JSON.stringify({ text }),
+    },
+  )
+
+  if (!res.ok) {
+    return errorResponse('Failed to update comment', res.status, await res.text())
   }
 
-  try {
-    // Verify ownership
-    const checkRes = await fetch(
-      `${REST_URL}/comments?id=eq.${id}&select=user_id`,
-      { headers: supabaseHeaders(token) }
-    )
-    const existing = await checkRes.json()
-    if (!existing.length) {
-      return Response.json({ error: 'Comment not found' }, { status: 404 })
-    }
-    if (existing[0].user_id !== user.id) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    const { text } = await request.json()
-    if (!text) {
-      return Response.json({ error: 'text is required' }, { status: 400 })
-    }
-
-    const res = await fetch(
-      `${REST_URL}/comments?id=eq.${id}`,
-      {
-        method: 'PATCH',
-        headers: supabaseHeaders(token),
-        body: JSON.stringify({ text }),
-      }
-    )
-
-    if (!res.ok) {
-      const error = await res.text()
-      return Response.json(
-        { error: 'Failed to update comment' },
-        { status: res.status }
-      )
-    }
-
-    const data = await res.json()
-    return Response.json(data[0] ?? data)
-  } catch (err) {
-    return Response.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+  const data = await res.json()
+  if (!Array.isArray(data) || data.length === 0) {
+    return errorResponse('Comment not found', 404)
   }
-}
 
-/**
- * DELETE /api/comments/[id]
- * Delete a comment. Auth required, only the author.
- */
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+  return Response.json(data[0])
+})
+
+export const DELETE = safeHandler(async (request: NextRequest, { params }: RouteParams) => {
   const { id } = await params
+  const numericId = parsePositiveInt(id)
+  if (!numericId) return errorResponse('Invalid comment ID', 400)
+
   const token = getToken(request)
   const user = await getUser(request)
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) return errorResponse('Unauthorized', 401)
+
+  const rlDel = await checkRateLimit(writeLimiter, user.id)
+  if (rlDel) return rlDel
+
+  const res = await fetch(
+    `${REST_URL}/comments?id=eq.${numericId}&user_id=eq.${user.id}`,
+    {
+      method: 'DELETE',
+      headers: supabaseHeaders(token),
+    },
+  )
+
+  if (!res.ok) {
+    return errorResponse('Failed to delete comment', res.status, await res.text())
   }
 
-  try {
-    // Verify ownership
-    const checkRes = await fetch(
-      `${REST_URL}/comments?id=eq.${id}&select=user_id`,
-      { headers: supabaseHeaders(token) }
-    )
-    const existing = await checkRes.json()
-    if (!existing.length) {
-      return Response.json({ error: 'Comment not found' }, { status: 404 })
-    }
-    if (existing[0].user_id !== user.id) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    const res = await fetch(
-      `${REST_URL}/comments?id=eq.${id}`,
-      {
-        method: 'DELETE',
-        headers: supabaseHeaders(token),
-      }
-    )
-
-    if (!res.ok) {
-      const error = await res.text()
-      return Response.json(
-        { error: 'Failed to delete comment' },
-        { status: res.status }
-      )
-    }
-
-    return Response.json({ success: true }, { status: 200 })
-  } catch (err) {
-    return Response.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+  const data = await res.json()
+  if (!Array.isArray(data) || data.length === 0) {
+    return errorResponse('Comment not found', 404)
   }
-}
+
+  return Response.json({ success: true })
+})

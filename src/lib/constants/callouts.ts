@@ -1,7 +1,3 @@
-// Callout positions for CS2 maps
-// Coordinates are percentages (0-100) relative to the radar image
-// Source: csnades.gg (Mirage), standard CS2 radar layouts (others)
-
 export const CALLOUTS: Record<string, Array<{ name: string; x: number; y: number }>> = {
   mirage: [
     { name: 'Window', x: 37, y: 44 },

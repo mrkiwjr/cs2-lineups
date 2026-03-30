@@ -47,9 +47,8 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
     setSubmitting(true)
     setError(null)
 
-    // Optimistic comment
     const optimistic: Comment = {
-      id: Date.now(), // temp ID
+      id: Date.now(),
       lineup_id: lineupId,
       user_id: user.id,
       text: trimmed,
@@ -78,10 +77,8 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
         throw new Error(errData.error || 'Ошибка отправки')
       }
 
-      // Re-fetch to get the real comment with correct ID and author
       await fetchComments()
     } catch (err: any) {
-      // Roll back optimistic update
       setComments((prev) => prev.filter((c) => c.id !== optimistic.id))
       setText(trimmed)
       setError(err.message || 'Не удалось отправить комментарий')
@@ -91,7 +88,6 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
   }
 
   const handleEdit = async (commentId: number, newText: string) => {
-    // Optimistic update
     setComments((prev) =>
       prev.map((c) =>
         c.id === commentId
@@ -112,13 +108,12 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
       if (!res.ok) throw new Error('Ошибка редактирования')
       await fetchComments()
     } catch {
-      await fetchComments() // rollback to server state
+      await fetchComments()
       setError('Не удалось отредактировать комментарий')
     }
   }
 
   const handleDelete = async (commentId: number) => {
-    // Optimistic removal
     const prev = comments
     setComments((c) => c.filter((item) => item.id !== commentId))
 
@@ -132,7 +127,7 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
 
       if (!res.ok) throw new Error('Ошибка удаления')
     } catch {
-      setComments(prev) // rollback
+      setComments(prev)
       setError('Не удалось удалить комментарий')
     }
   }
@@ -146,7 +141,6 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center gap-2">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/40">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -156,14 +150,12 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
         </h3>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">
           {error}
         </div>
       )}
 
-      {/* Comments list */}
       {loading ? (
         <div className="space-y-4">
           {[1, 2].map((i) => (
@@ -195,10 +187,8 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
         </div>
       )}
 
-      {/* Divider */}
       <div className="border-t border-[#2a2b36]" />
 
-      {/* Add comment form or login prompt */}
       {user ? (
         <div className="space-y-2">
           <textarea

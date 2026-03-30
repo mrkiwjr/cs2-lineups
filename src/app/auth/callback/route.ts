@@ -6,7 +6,6 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const rawNext = searchParams.get('next') ?? '/'
-  // Prevent open redirect — only allow paths starting with / (not //)
   const next = (rawNext.startsWith('/') && !rawNext.startsWith('//')) ? rawNext : '/'
 
   if (code) {
@@ -20,7 +19,7 @@ export async function GET(request: Request) {
             getAll() { return cookieStore.getAll() },
             setAll(cookiesToSet) {
               cookiesToSet.forEach(({ name, value, options }) => {
-                try { cookieStore.set(name, value, options) } catch {}
+                try { cookieStore.set(name, value, options) } catch { }
               })
             },
           },

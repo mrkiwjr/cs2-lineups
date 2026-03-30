@@ -1,27 +1,30 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
 import Topbar from '@/components/layout/Topbar'
 import Sidebar from '@/components/layout/Sidebar'
 import MapArea from '@/components/map/MapArea'
-import DetailPanel from '@/components/detail/DetailPanel'
 import { AuthButton } from '@/components/auth/AuthButton'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { useLineups } from '@/hooks/useLineups'
 import { useFilters } from '@/hooks/useFilters'
 import type { LineupWithStats } from '@/lib/types/lineup'
 
+const DetailPanel = dynamic(() => import('@/components/detail/DetailPanel'), { ssr: false })
+
 export default function Home() {
   const { user, accessToken } = useAuth()
-  const { lineups, loading, error } = useLineups()
+  const { lineups, positions, loading, error } = useLineups()
   const { filters, setFilter, setMap, setTab, setSearch, initialLineupId } = useFilters()
 
   const [activeLineup, setActiveLineup] = useState<LineupWithStats | null>(null)
   const [favorites, setFavorites] = useState<Set<number>>(new Set())
   const [hoveredId, setHoveredId] = useState<number | null>(null)
+  const favoritesRef = useRef(favorites)
+  favoritesRef.current = favorites
 
-  // Load favorites via API when user logs in
   useEffect(() => {
     if (!user || !accessToken) {
       setFavorites(new Set())
@@ -43,7 +46,6 @@ export default function Home() {
     loadFavorites()
   }, [user, accessToken])
 
-  // Open lineup from URL hash on load
   useEffect(() => {
     if (initialLineupId && lineups.length > 0) {
       const lineup = lineups.find((l) => l.id === initialLineupId)
@@ -54,7 +56,6 @@ export default function Home() {
     }
   }, [initialLineupId, lineups])
 
-  // Filter lineups
   const filtered = useMemo(() => {
     let result = lineups
 
@@ -82,7 +83,6 @@ export default function Home() {
     return result
   }, [lineups, filters, favorites])
 
-  // Lineup selection
   const handleLineupClick = useCallback(
     (lineup: LineupWithStats) => {
       setActiveLineup(lineup)
@@ -98,13 +98,11 @@ export default function Home() {
     setActiveLineup(null)
   }, [])
 
-  // Toggle favorite via API
   const handleToggleFavorite = useCallback(
     async (id: number) => {
       if (!user || !accessToken) return
-      const isFav = favorites.has(id)
+      const isFav = favoritesRef.current.has(id)
 
-      // Optimistic update
       setFavorites((prev) => {
         const next = new Set(prev)
         if (isFav) next.delete(id)
@@ -135,7 +133,6 @@ export default function Home() {
           if (!res.ok) throw new Error('Failed to add favorite')
         }
       } catch (err) {
-        // Rollback optimistic update on error
         console.error('[Home] Toggle favorite error:', err)
         setFavorites((prev) => {
           const next = new Set(prev)
@@ -145,10 +142,9 @@ export default function Home() {
         })
       }
     },
-    [user, accessToken, favorites]
+    [user, accessToken]
   )
 
-  // Record view
   const recordView = async (lineupId: number) => {
     try {
       await fetch('/api/views', {
@@ -156,7 +152,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lineup_id: lineupId }),
       })
-    } catch {}
+    } catch { }
   }
 
   return (
@@ -186,9 +182,7 @@ export default function Home() {
             <AuthButton />
           </Topbar>
 
-          {/* Desktop: sidebar + map side by side. Mobile: only map */}
           <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar — desktop only */}
             <div className="hidden md:block w-[260px] flex-shrink-0 h-full overflow-y-auto">
               <Sidebar
                 lineups={filtered}
@@ -204,7 +198,6 @@ export default function Home() {
               />
             </div>
 
-            {/* Map + promo */}
             <div className="flex-1 min-h-[50vh] md:min-h-0 flex flex-col">
               <div className="flex-1">
                 <MapArea
@@ -214,10 +207,10 @@ export default function Home() {
                   onLineupClick={handleLineupClick}
                   hoveredId={hoveredId}
                   onHover={setHoveredId}
+                  positions={positions}
                 />
               </div>
 
-              {/* Promo block — under map on mobile */}
               <div className="md:hidden mx-3 my-4 p-4 rounded-xl bg-[#1a1b26] border border-[#2a2b36]">
                 <p className="text-[#c0c4d6] text-sm leading-relaxed">
                   <span className="text-[#4ea8d1] font-bold">CS2 Lineups</span> — лучшее место для изучения раскидов гранат в Counter-Strike 2.

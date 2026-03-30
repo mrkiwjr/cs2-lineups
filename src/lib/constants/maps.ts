@@ -1,15 +1,3 @@
-// CS2 radar images + positions calibrated from tradeit.gg callout maps
-// and verified with radar config (pos_x, pos_y, scale) + game spawn coordinates
-//
-// ACTUAL orientations (confirmed mathematically):
-//   Mirage:   T=RIGHT, CT=LEFT, A=BOTTOM, B=UPPER-LEFT
-//   Inferno:  T=LOWER-LEFT, CT=RIGHT, A=LOWER-RIGHT, B=UPPER
-//   Dust2:    T=BOTTOM, CT=CENTER, A=UPPER-RIGHT, B=UPPER-LEFT
-//   Nuke:     T=LEFT, CT=RIGHT, A=CENTER, B=UPPER-LEFT
-//   Anubis:   T=BOTTOM, CT=UPPER, A=RIGHT, B=LEFT-CENTER
-//   Ancient:  T=BOTTOM, CT=UPPER, A=LEFT(!), B=RIGHT(!)
-//   Overpass: T=BOTTOM, CT=UPPER-LEFT, A=UPPER-LEFT, B=UPPER-RIGHT
-
 export interface MapPosition {
   x: number
   y: number
@@ -123,7 +111,6 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   ancient: {
-    // A Site = LEFT side, B Site = RIGHT side
     image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_ancient.png',
     positions: {
       'T Spawn':  { x: 48, y: 87 },
@@ -139,7 +126,6 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   overpass: {
-    // A Site = UPPER-LEFT, B Site = UPPER-RIGHT
     image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_overpass.png',
     positions: {
       'T Spawn':   { x: 68, y: 91 },
