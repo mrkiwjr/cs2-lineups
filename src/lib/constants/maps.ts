@@ -10,7 +10,7 @@ export interface MapData {
 
 export const MAPS: Record<string, MapData> = {
   mirage: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_mirage.png',
+    image: '/maps/de_mirage.png',
     positions: {
       'T Spawn':      { x: 78, y: 50 },
       'CT Spawn':     { x: 35, y: 88 },
@@ -36,7 +36,7 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   inferno: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_inferno.png',
+    image: '/maps/de_inferno.png',
     positions: {
       'T Spawn':    { x: 10, y: 68 },
       'CT Spawn':   { x: 89, y: 35 },
@@ -55,7 +55,7 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   dust2: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_dust2.png',
+    image: '/maps/de_dust2.png',
     positions: {
       'T Spawn':       { x: 40, y: 90 },
       'CT Spawn':      { x: 59, y: 20 },
@@ -76,7 +76,7 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   nuke: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_nuke.png',
+    image: '/maps/de_nuke.png',
     positions: {
       'T Spawn':   { x: 23, y: 55 },
       'T Roof':    { x: 46, y: 56 },
@@ -94,7 +94,7 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   anubis: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_anubis.png',
+    image: '/maps/de_anubis.png',
     positions: {
       'T Spawn':          { x: 38, y: 88 },
       'T Spawn (двор)':   { x: 38, y: 88 },
@@ -111,7 +111,7 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   ancient: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_ancient.png',
+    image: '/maps/de_ancient.png',
     positions: {
       'T Spawn':  { x: 48, y: 87 },
       'CT Spawn': { x: 50, y: 12 },
@@ -126,7 +126,7 @@ export const MAPS: Record<string, MapData> = {
     },
   },
   overpass: {
-    image: 'https://raw.githubusercontent.com/2mlml/cs2-radar-images/master/de_overpass.png',
+    image: '/maps/de_overpass.png',
     positions: {
       'T Spawn':   { x: 68, y: 91 },
       'CT Spawn':  { x: 48, y: 18 },

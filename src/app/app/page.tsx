@@ -163,11 +163,11 @@ export default function Home() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex h-screen items-center justify-center bg-[#0d0e14]"
+          className="flex h-screen items-center justify-center bg-black"
         >
-          <div className="text-center">
-            <div className="text-[#8b8fa3]">Загрузка...</div>
-            {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
+          <div className="text-center font-mono">
+            <div className="text-[#5a8a9e] text-sm crt-glow-smoke">{'>'} ЗАГРУЗКА СИСТЕМЫ...<span className="animate-[blink-cursor_0.8s_infinite]">_</span></div>
+            {error && <div className="mt-2 text-[#9e3e2a] text-xs">{error}</div>}
           </div>
         </motion.div>
       ) : (
@@ -211,13 +211,10 @@ export default function Home() {
                 />
               </div>
 
-              <div className="md:hidden mx-3 my-4 p-4 rounded-xl bg-[#1a1b26] border border-[#2a2b36]">
-                <p className="text-[#c0c4d6] text-sm leading-relaxed">
-                  <span className="text-[#4ea8d1] font-bold">CS2 Lineups</span> — лучшее место для изучения раскидов гранат в Counter-Strike 2.
-                  Дымы, флэшки, молотовы и HE для всех карт.{' '}
-                  <a href="/" className="text-[#d4a843] underline">Лендинг</a>
-                  {' '}или{' '}
-                  <a href="https://discord.gg/" className="text-[#7289da] underline">Discord</a>.
+              <div className="md:hidden mx-3 my-4 p-3 border border-[#1c1c1c] bg-[#0a0a0a]">
+                <p className="text-[#444444] text-xs leading-relaxed">
+                  <span className="text-[#5a8a9e] font-bold">[CS2]</span> LINEUPS — раскиды гранат для CS2.{' '}
+                  <a href="/" className="text-[#5a8a9e] underline">Главная</a>
                 </p>
               </div>
             </div>
