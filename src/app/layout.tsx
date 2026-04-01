@@ -1,12 +1,7 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { JetBrains_Mono } from 'next/font/google'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import './globals.css'
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin', 'cyrillic'],
-})
 
 const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
@@ -24,14 +19,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ru" className={`${inter.variable} ${jetbrainsMono.variable} h-full dark`}>
+    <html lang="ru" className={`${jetbrainsMono.variable} h-full dark`}>
       <head>
         <link rel="preconnect" href="https://assets.csnades.gg" />
         <link rel="preconnect" href="https://customer-9h7e8ahl6hivmjb6.cloudflarestream.com" />
         <link rel="dns-prefetch" href="https://assets.csnades.gg" />
         <link rel="dns-prefetch" href="https://customer-9h7e8ahl6hivmjb6.cloudflarestream.com" />
       </head>
-      <body className="min-h-full bg-[#0d0e14] font-sans text-white antialiased">
+      <body className="min-h-full bg-black font-mono text-[#888888] antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

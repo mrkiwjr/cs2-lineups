@@ -2,46 +2,49 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
-const SmokeIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <circle cx="12" cy="12" r="8" stroke="#4ea8d1" strokeWidth="2" />
-    <path d="M8 12c0-2 2-4 4-4" stroke="#4ea8d1" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-)
-const FlashIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M13 2L4 14h7l-2 8 9-12h-7l2-8z" fill="#d4a843" />
-  </svg>
-)
-const MolotovIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M12 22c-4 0-7-3-7-7 0-4 7-11 7-11s7 7 7 11c0 4-3 7-7 7z" fill="#d14e4e" />
-  </svg>
-)
-const HEIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <circle cx="12" cy="12" r="7" stroke="#4ed17a" strokeWidth="2" />
-    <path d="M12 8v4M10 10h4" stroke="#4ed17a" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
+function TypingText({ text, delay = 0 }: { text: string; delay?: number }) {
+  const [displayed, setDisplayed] = useState('')
+  const [started, setStarted] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStarted(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  useEffect(() => {
+    if (!started) return
+    let i = 0
+    const interval = setInterval(() => {
+      if (i <= text.length) {
+        setDisplayed(text.slice(0, i))
+        i++
+      } else {
+        clearInterval(interval)
+      }
+    }, 40)
+    return () => clearInterval(interval)
+  }, [started, text])
+
+  return (
+    <span>
+      {displayed}
+      <span className="animate-[blink-cursor_0.8s_infinite]">_</span>
+    </span>
+  )
+}
 
 function Counter({ value, suffix = '' }: { value: number; suffix?: string }) {
   return (
     <motion.span
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
+      className="crt-glow"
     >
-      <motion.span
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
-        {value}{suffix}
-      </motion.span>
+      {value}{suffix}
     </motion.span>
   )
 }
@@ -51,143 +54,122 @@ const stagger = {
   show: { transition: { staggerChildren: 0.1 } },
 }
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const } },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 }
 
 export default function LandingPage() {
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
   return (
-    <div className="min-h-screen bg-[#0a0b10] text-white overflow-x-hidden">
-      <div
-        className="pointer-events-none fixed inset-0 z-50 opacity-[0.03]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
-      <nav className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 backdrop-blur-xl bg-[#0a0b10]/70">
-        <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
-          <Link href="/landing" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4ea8d1] to-[#d14e4e] flex items-center justify-center text-xs font-black tracking-tighter">
-              CS2
-            </div>
-            <span className="font-black text-lg tracking-tight">
-              LINEUPS
-            </span>
+    <div className="min-h-screen bg-black text-[#888888] overflow-x-hidden">
+      {/* NAV */}
+      <nav className="fixed top-0 left-0 right-0 z-40 border-b border-[#1c1c1c] bg-black">
+        <div className="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 group">
+            <span className="text-[#cccccc] font-bold text-sm crt-glow">[CS2]</span>
+            <span className="text-[#888888] font-bold text-sm tracking-wider">LINEUPS</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link
               href="/app"
-              className="px-5 py-2 text-sm font-semibold text-[#8b8fa3] hover:text-white transition-colors"
+              className="px-4 py-1.5 text-xs font-medium text-[#444444] hover:text-[#888888] transition-colors"
             >
               Приложение
             </Link>
             <Link
               href="/app"
-              className="px-5 py-2.5 text-sm font-bold rounded-lg bg-gradient-to-r from-[#4ea8d1] to-[#3b82c4] hover:from-[#5bb8e1] hover:to-[#4b92d4] transition-all shadow-lg shadow-[#4ea8d1]/20"
+              className="px-4 py-1.5 text-xs font-medium border border-[#2a2a2a] text-[#cccccc] hover:bg-[#1a1a1a] hover:border-[#444444] transition-all"
             >
-              Открыть карту
+              [ ОТКРЫТЬ КАРТУ ]
             </Link>
           </div>
         </div>
       </nav>
 
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-16">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(/hero-bg.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 30%',
-          }}
-        />
-        <div className="absolute inset-0 bg-[#0a0b10]/70" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0b10] via-transparent to-[#0a0b10]" />
-
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-[#4ea8d1]/8 blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#d14e4e]/6 blur-[150px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-[#d4a843]/5 blur-[100px]" />
-
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '80px 80px',
-        }} />
-
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      {/* HERO */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-14">
+        <motion.div style={{ opacity: heroOpacity }} className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#4ea8d1]/30 bg-[#4ea8d1]/5 text-[#4ea8d1] text-xs font-mono font-bold tracking-wider uppercase mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1 border border-[#1c1c1c] text-[#5a8a9e] text-xs font-bold tracking-wider uppercase mb-10"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4ea8d1] animate-pulse" />
-            7 карт · 48 лайнапов · обновляется
+            <span className="w-1.5 h-1.5 bg-[#5a8a9e] animate-pulse" />
+            7 карт // 48 лайнапов // active
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="text-5xl sm:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tight mb-6"
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight mb-8"
           >
-            <span className="block">Раскиды для</span>
-            <span className="block mt-2 bg-gradient-to-r from-[#4ea8d1] via-[#d4a843] to-[#d14e4e] bg-clip-text text-transparent">
-              реальных пацанов
+            <span
+              className="block text-[#cccccc] crt-glitch"
+              data-text="РАСКИДЫ ДЛЯ"
+            >
+              РАСКИДЫ ДЛЯ
+            </span>
+            <span
+              className="block mt-3 text-[#5a8a9e] crt-glitch crt-glow-smoke"
+              data-text="РЕАЛЬНЫХ ПАЦАНОВ"
+            >
+              РЕАЛЬНЫХ ПАЦАНОВ
             </span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="text-lg sm:text-xl text-[#8b8fa3] max-w-2xl mx-auto mb-10 leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="text-sm sm:text-base text-[#444444] max-w-xl mx-auto mb-10 leading-relaxed"
           >
-            Без воды, без булшита. Только рабочие лайнапы от про-игроков.
-            <br />
-            <span className="text-[#c0c4d6]">Выучи — закидай — стань красавцем.</span>
+            <TypingText
+              text="Без воды, без булшита. Только рабочие лайнапы от про-игроков."
+              delay={1200}
+            />
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.5 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link
               href="/app"
-              className="group relative px-8 py-4 rounded-xl font-bold text-lg overflow-hidden"
+              className="group px-8 py-3 border border-[#2a2a2a] text-[#cccccc] font-bold text-sm hover:bg-[#1a1a1a] hover:border-[#5a8a9e] transition-all crt-glow"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#4ea8d1] to-[#3b82c4] group-hover:from-[#5bb8e1] group-hover:to-[#4b92d4] transition-all" />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%)] bg-[length:250%_250%] animate-[shimmer_2s_infinite]" />
-              <span className="relative z-10">Открыть карту</span>
+              {'>'} ОТКРЫТЬ КАРТУ<span className="animate-[blink-cursor_0.8s_infinite]">_</span>
             </Link>
-            <span className="text-sm text-[#555] font-mono">бесплатно · без регистрации</span>
+            <span className="text-xs text-[#2a2a2a]">бесплатно // без регистрации</span>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1 }}
-            className="flex items-center justify-center gap-6 mt-16 text-[#555]"
+            transition={{ delay: 2, duration: 1 }}
+            className="flex items-center justify-center gap-8 mt-16"
           >
-            {['Дымы', 'Флэшки', 'Молотовы', 'HE'].map((name, i) => (
-              <motion.div
-                key={name}
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, delay: i * 0.3, repeat: Infinity, ease: 'easeInOut' }}
-                className="flex items-center gap-1.5 text-xs font-mono"
+            {[
+              { name: 'SMOKE', color: '#5a8a9e' },
+              { name: 'FLASH', color: '#a89a3a' },
+              { name: 'MOLOTOV', color: '#9e3e2a' },
+              { name: 'HE', color: '#3e8a2e' },
+            ].map((g, i) => (
+              <motion.span
+                key={g.name}
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 2, delay: i * 0.5, repeat: Infinity }}
+                className="text-xs font-bold tracking-wider"
+                style={{ color: g.color }}
               >
-                {i === 0 && <SmokeIcon />}
-                {i === 1 && <FlashIcon />}
-                {i === 2 && <MolotovIcon />}
-                {i === 3 && <HEIcon />}
-                {name}
-              </motion.div>
+                [{g.name}]
+              </motion.span>
             ))}
           </motion.div>
         </motion.div>
@@ -195,60 +177,33 @@ export default function LandingPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
+          transition={{ delay: 2.5 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
           <motion.div
-            animate={{ y: [0, 8, 0] }}
+            animate={{ y: [0, 6, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-5 h-8 rounded-full border-2 border-[#333] flex items-start justify-center p-1"
+            className="text-[#2a2a2a] text-lg"
           >
-            <div className="w-1 h-2 rounded-full bg-[#555]" />
+            V
           </motion.div>
         </motion.div>
       </section>
 
-      <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#4ea8d1]/3 to-transparent" />
-        <motion.div
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 max-w-6xl mx-auto"
-        >
-          <div className="rounded-2xl border border-white/10 bg-[#12131a] p-2 shadow-2xl shadow-black/50">
-            <div className="flex items-center gap-1.5 px-3 py-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#d14e4e]/60" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#d4a843]/60" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#4ed17a]/60" />
-              <span className="ml-3 text-[10px] font-mono text-[#555]">cs2-lineups.netlify.app</span>
-            </div>
-            <div className="rounded-xl overflow-hidden border border-white/5 aspect-[16/9] bg-[#0d0e14] flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">🗺️</div>
-                <p className="text-[#8b8fa3] font-mono text-sm">Интерактивная карта с лайнапами</p>
-                <p className="text-[#555] font-mono text-xs mt-1">Кликни на маркер → получи инструкцию</p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      <section className="py-32 px-6">
-        <div className="max-w-6xl mx-auto">
+      {/* FEATURES */}
+      <section className="py-28 px-6">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4">
-              Всё что нужно для
-              <span className="bg-gradient-to-r from-[#4ea8d1] to-[#4ed17a] bg-clip-text text-transparent"> побед</span>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#cccccc] crt-glow mb-3">
+              {'>'} ВОЗМОЖНОСТИ
             </h2>
-            <p className="text-[#8b8fa3] text-lg max-w-xl mx-auto">
-              Не просто картинки с прицелами. Полноценная система обучения гранатам.
+            <p className="text-[#444444] text-sm">
+              // не просто картинки с прицелами
             </p>
           </motion.div>
 
@@ -257,141 +212,142 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {[
               {
-                icon: '🗺️',
+                icon: '[MAP]',
                 title: 'Интерактивная карта',
-                desc: 'Leaflet-карта с маркерами гранат. Кликни → увидишь откуда и куда кидать. Траектория рисуется прямо на карте.',
-                accent: '#4ea8d1',
+                desc: 'Маркеры гранат на карте. Кликни — увидишь откуда и куда кидать.',
+                accent: '#5a8a9e',
               },
               {
-                icon: '🎯',
+                icon: '[7x48+]',
                 title: '7 карт, 48+ лайнапов',
-                desc: 'Mirage, Inferno, Dust 2, Nuke, Anubis, Ancient, Overpass. Дымы, флэшки, молотовы, HE — всё на месте.',
-                accent: '#d4a843',
+                desc: 'Mirage, Inferno, Dust 2, Nuke, Anubis, Ancient, Overpass.',
+                accent: '#a89a3a',
               },
               {
-                icon: '⚡',
+                icon: '[>>]',
                 title: 'Фильтры за секунду',
-                desc: 'Граната + сторона + карта. Три клика — и видишь только то, что нужно. URL обновляется — кидай ссылку тиммейту.',
-                accent: '#4ed17a',
+                desc: 'Граната + сторона + карта. Три клика — видишь только нужное.',
+                accent: '#3e8a2e',
               },
               {
-                icon: '🔐',
+                icon: '[KEY]',
                 title: 'Вход через Discord',
-                desc: 'Залогинился — получил доступ к избранному, комментариям, добавлению своих лайнапов. Google тоже работает.',
-                accent: '#7c6ee7',
+                desc: 'Избранное, комментарии, свои лайнапы. Google тоже работает.',
+                accent: '#5a8a9e',
               },
               {
-                icon: '💬',
+                icon: '[///]',
                 title: 'Комментарии',
-                desc: '«А ещё можно кинуть чуть левее» — обсуждай лайнапы с комьюнити. Редактируй и удаляй свои.',
-                accent: '#d14e4e',
+                desc: 'Обсуждай лайнапы с комьюнити. Редактируй и удаляй свои.',
+                accent: '#9e3e2a',
               },
               {
-                icon: '📱',
+                icon: '[MOB]',
                 title: 'Работает везде',
-                desc: 'Открой на телефоне перед каткой — посмотри лайнап, закрой, закинь. Никаких приложений, просто сайт.',
-                accent: '#d4a843',
+                desc: 'Открой на телефоне перед каткой. Никаких приложений.',
+                accent: '#a89a3a',
               },
             ].map((feature) => (
               <motion.div
                 key={feature.title}
                 variants={fadeUp}
-                className="group relative p-6 rounded-2xl border border-white/5 bg-[#12131a] hover:border-white/10 transition-all duration-300"
+                className="group p-5 border border-[#1c1c1c] bg-black hover:bg-[#0a0a0a] hover:border-[#2a2a2a] transition-all duration-300"
               >
                 <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: `radial-gradient(circle at 50% 0%, ${feature.accent}08, transparent 70%)` }}
-                />
-                <div className="relative z-10">
-                  <div className="text-3xl mb-4">{feature.icon}</div>
-                  <h3 className="text-lg font-bold mb-2 tracking-tight">{feature.title}</h3>
-                  <p className="text-sm text-[#8b8fa3] leading-relaxed">{feature.desc}</p>
+                  className="text-sm font-bold mb-3 tracking-wider"
+                  style={{ color: feature.accent }}
+                >
+                  {feature.icon}
                 </div>
+                <h3 className="text-sm font-bold mb-2 text-[#cccccc]">{feature.title}</h3>
+                <p className="text-xs text-[#444444] leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      <section className="py-32 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#d14e4e]/3 to-transparent" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight">В цифрах</h2>
-          </motion.div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { value: 7, suffix: '', label: 'Карт', sub: 'Все актуальные' },
-              { value: 48, suffix: '+', label: 'Лайнапов', sub: 'И растёт' },
-              { value: 4, suffix: '', label: 'Типа гранат', sub: 'Smoke · Flash · Molotov · HE' },
-              { value: 0, suffix: '₽', label: 'Цена', sub: 'Бесплатно навсегда' },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="text-center p-6 rounded-2xl border border-white/5 bg-[#12131a]"
-              >
-                <div className="text-4xl sm:text-5xl font-black tracking-tight mb-1">
-                  <Counter value={stat.value} suffix={stat.suffix} />
-                </div>
-                <div className="text-sm font-bold text-[#c0c4d6] mb-1">{stat.label}</div>
-                <div className="text-xs text-[#555] font-mono">{stat.sub}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-32 px-6">
+      {/* STATS */}
+      <section className="py-28 px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4">
-              Три шага до
-              <span className="bg-gradient-to-r from-[#d4a843] to-[#d14e4e] bg-clip-text text-transparent"> красавца</span>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#cccccc] crt-glow">
+              {'>'} В ЦИФРАХ
             </h2>
           </motion.div>
 
-          <div className="space-y-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { step: '01', title: 'Открой карту', desc: 'Выбери карту, граната, сторону. Видишь маркеры — это точки бросков.', color: '#4ea8d1' },
-              { step: '02', title: 'Изучи лайнап', desc: 'Кликни на маркер. Видео, описание, откуда встать, куда целиться. Всё разжёвано.', color: '#d4a843' },
-              { step: '03', title: 'Закидай на катке', desc: 'Тиммейты в шоке. Противники в ярости. Ты — красавец.', color: '#4ed17a' },
+              { value: 7, suffix: '', label: 'КАРТ', sub: 'все актуальные' },
+              { value: 48, suffix: '+', label: 'ЛАЙНАПОВ', sub: 'и растёт' },
+              { value: 4, suffix: '', label: 'ТИПА ГРАНАТ', sub: 'smoke // flash // molotov // he' },
+              { value: 0, suffix: '₽', label: 'ЦЕНА', sub: 'бесплатно навсегда' },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="text-center p-5 border border-[#1c1c1c] border-dashed"
+              >
+                <div className="text-3xl sm:text-4xl font-black tracking-tight mb-1 text-[#cccccc]">
+                  <Counter value={stat.value} suffix={stat.suffix} />
+                </div>
+                <div className="text-[10px] font-bold text-[#444444] uppercase tracking-widest mb-1">{stat.label}</div>
+                <div className="text-[10px] text-[#2a2a2a]">{stat.sub}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* STEPS */}
+      <section className="py-28 px-6">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#cccccc] crt-glow">
+              {'>'} ТРИ ШАГА
+            </h2>
+          </motion.div>
+
+          <div className="space-y-3">
+            {[
+              { step: '01', title: 'Открой карту', desc: 'Выбери карту, граната, сторону. Видишь маркеры — это точки бросков.', color: '#5a8a9e' },
+              { step: '02', title: 'Изучи лайнап', desc: 'Кликни на маркер. Видео, описание, откуда встать, куда целиться.', color: '#a89a3a' },
+              { step: '03', title: 'Закидай на катке', desc: 'Тиммейты в шоке. Противники в ярости. Ты — красавец.', color: '#3e8a2e' },
             ].map((item, i) => (
               <motion.div
                 key={item.step}
-                initial={{ opacity: 0, x: -30 }}
+                initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-                className="flex items-start gap-6 p-6 rounded-2xl border border-white/5 bg-[#12131a] hover:border-white/10 transition-colors"
+                transition={{ delay: i * 0.15, duration: 0.4 }}
+                className="flex items-start gap-5 p-5 border border-[#1c1c1c] hover:border-[#2a2a2a] transition-colors"
               >
-                <div
-                  className="shrink-0 w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl"
-                  style={{ background: `${item.color}15`, color: item.color }}
+                <span
+                  className="text-lg font-black shrink-0"
+                  style={{ color: item.color }}
                 >
-                  {item.step}
-                </div>
+                  {item.step} {'>'}
+                </span>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">{item.title}</h3>
-                  <p className="text-[#8b8fa3]">{item.desc}</p>
+                  <h3 className="text-sm font-bold mb-1 text-[#cccccc]">{item.title}</h3>
+                  <p className="text-xs text-[#444444]">{item.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -399,62 +355,48 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-32 px-6 relative">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full bg-[#4ea8d1]/5 blur-[150px]" />
-        </div>
+      {/* CTA */}
+      <section className="py-28 px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative z-10 max-w-3xl mx-auto text-center"
+          className="max-w-2xl mx-auto text-center"
         >
-          <h2 className="text-4xl sm:text-6xl font-black tracking-tight mb-6">
-            Хватит сливать
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight mb-6 text-[#cccccc] crt-glow">
+            ХВАТИТ СЛИВАТЬ
             <br />
-            <span className="bg-gradient-to-r from-[#4ea8d1] via-[#d4a843] to-[#d14e4e] bg-clip-text text-transparent">
-              из-за гранат
-            </span>
+            <span className="text-[#5a8a9e] crt-glow-smoke">ИЗ-ЗА ГРАНАТ</span>
           </h2>
-          <p className="text-xl text-[#8b8fa3] mb-10">
-            Выучи 10 лайнапов — и ты уже лучше 90% игроков в MM.
+          <p className="text-sm text-[#444444] mb-8">
+            // выучи 10 лайнапов — и ты уже лучше 90% игроков в MM
           </p>
           <Link
             href="/app"
-            className="inline-flex items-center gap-3 px-10 py-5 rounded-xl font-bold text-lg bg-gradient-to-r from-[#4ea8d1] to-[#3b82c4] hover:from-[#5bb8e1] hover:to-[#4b92d4] transition-all shadow-xl shadow-[#4ea8d1]/20 hover:shadow-[#4ea8d1]/30"
+            className="inline-block px-10 py-4 border border-[#2a2a2a] text-[#cccccc] font-bold text-sm hover:bg-[#1a1a1a] hover:border-[#5a8a9e] transition-all crt-glow"
           >
-            Открыть карту
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
+            {'['} ОТКРЫТЬ КАРТУ → {']'}
           </Link>
         </motion.div>
       </section>
 
-      <footer className="border-t border-white/5 py-12 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md bg-gradient-to-br from-[#4ea8d1] to-[#d14e4e] flex items-center justify-center text-[9px] font-black">
-              CS2
-            </div>
-            <span className="font-bold text-sm tracking-tight">LINEUPS</span>
+      {/* FOOTER */}
+      <footer className="border-t border-[#1c1c1c] py-10 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[#cccccc] font-bold text-xs crt-glow">[CS2]</span>
+            <span className="text-[#444444] font-bold text-xs">LINEUPS</span>
           </div>
-          <div className="flex items-center gap-6 text-xs text-[#555] font-mono">
-            <Link href="/app" className="hover:text-[#8b8fa3] transition-colors">Приложение</Link>
-            <a href="https://github.com/mrkiwjr/cs2-lineups" target="_blank" rel="noopener" className="hover:text-[#8b8fa3] transition-colors">GitHub</a>
+          <div className="flex items-center gap-6 text-xs text-[#2a2a2a]">
+            <Link href="/app" className="hover:text-[#444444] transition-colors">Приложение</Link>
+            <span className="text-[#1c1c1c]">|</span>
+            <a href="https://github.com/mrkiwjr/cs2-lineups" target="_blank" rel="noopener" className="hover:text-[#444444] transition-colors">GitHub</a>
           </div>
-          <div className="text-xs text-[#333] font-mono">
-            {new Date().getFullYear()} · сделано с 💀
+          <div className="text-xs text-[#1c1c1c]">
+            ═══ {new Date().getFullYear()} ═══
           </div>
         </div>
       </footer>
-
-      <style jsx global>{`
-        @keyframes shimmer {
-          0% { background-position: -250% -250%; }
-          100% { background-position: 250% 250%; }
-        }
-      `}</style>
     </div>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
 import { colorMap, typeLabels } from '@/lib/constants/labels'
 import type {
   GrenadeType,
@@ -26,17 +25,17 @@ const throwShortLabels: Record<string, string> = {
 }
 
 const TYPE_FILTERS: { value: GrenadeType | 'all'; label: string }[] = [
-  { value: 'all', label: 'Все' },
-  { value: 'smoke', label: 'Дым' },
-  { value: 'flash', label: 'Флэш' },
-  { value: 'molotov', label: 'Молотов' },
+  { value: 'all', label: 'ВСЕ' },
+  { value: 'smoke', label: 'ДЫМ' },
+  { value: 'flash', label: 'ФЛЭШ' },
+  { value: 'molotov', label: 'МОЛОТОВ' },
   { value: 'he', label: 'HE' },
 ]
 
 const SIDE_FILTERS: { value: Side | 'all'; label: string }[] = [
-  { value: 'all', label: 'Обе' },
-  { value: 'T', label: 'Атака' },
-  { value: 'CT', label: 'Защита' },
+  { value: 'all', label: 'ОБЕ' },
+  { value: 'T', label: 'T' },
+  { value: 'CT', label: 'CT' },
 ]
 
 interface SidebarProps {
@@ -89,165 +88,140 @@ export default function Sidebar({
   }, [filterKey])
 
   return (
-    <aside className="w-[260px] bg-[#13141a] overflow-y-auto flex flex-col shrink-0 border-r border-[#2a2b36]">
+    <aside className="w-[260px] bg-[#0a0a0a] overflow-y-auto flex flex-col shrink-0 border-r border-[#1c1c1c]">
+      {/* Search */}
       <div className="px-3 pt-3 pb-1">
-        <div className="relative">
-          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
+        <div className="relative flex items-center">
+          <span className="absolute left-2.5 text-[#444444] text-xs font-bold">{'>'}</span>
           <input
             type="text"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="Поиск лайнапов..."
-            className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg pl-8 pr-7 py-1.5 text-xs text-white/80 placeholder:text-white/25 outline-none focus:border-white/20 transition-colors"
+            placeholder="поиск..."
+            className="w-full bg-black border border-[#1c1c1c] pl-6 pr-7 py-1.5 text-xs text-[#888888] placeholder:text-[#2a2a2a] outline-none focus:border-[#2a2a2a] transition-colors"
           />
           {searchInput && (
             <button
               onClick={() => setSearchInput('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+              className="absolute right-2 text-[#444444] hover:text-[#888888] transition-colors text-xs"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              x
             </button>
           )}
         </div>
       </div>
 
+      {/* Grenade filter */}
       <div className="px-3 pt-3 pb-1">
-        <div className="text-[10px] uppercase tracking-wider text-white/30 mb-1.5 font-medium">
-          Граната
+        <div className="text-[10px] text-[#2a2a2a] mb-1.5 font-bold">
+          // ГРАНАТА
         </div>
         <div className="flex flex-wrap gap-1">
           {TYPE_FILTERS.map(({ value, label }) => (
-            <motion.button
+            <button
               key={value}
-              whileTap={{ scale: 0.98 }}
               onClick={() => onFilterChange('type', value)}
               className={`
-                flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors
+                flex items-center gap-1 px-2 py-1 text-[10px] font-bold tracking-wider transition-colors border
                 ${
                   filters.type === value
-                    ? 'bg-[#2a2b36] text-white'
-                    : 'text-white/40 hover:text-white/70 hover:bg-[#1e1f2a]'
-                }
-              `}
-            >
-              {value === 'all' ? (
-                <span className="text-[10px]">&#x2726;</span>
-              ) : (
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ background: colorMap[value] }}
-                />
-              )}
-              {label}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      <div className="px-3 pt-2 pb-1">
-        <div className="text-[10px] uppercase tracking-wider text-white/30 mb-1.5 font-medium">
-          Сторона
-        </div>
-        <div className="flex gap-1">
-          {SIDE_FILTERS.map(({ value, label }) => (
-            <motion.button
-              key={value}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onFilterChange('side', value)}
-              className={`
-                flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors
-                ${
-                  filters.side === value
-                    ? 'bg-[#2a2b36] text-white'
-                    : 'text-white/40 hover:text-white/70 hover:bg-[#1e1f2a]'
+                    ? 'border-[#2a2a2a] bg-[#1a1a1a] text-[#cccccc]'
+                    : 'border-transparent text-[#444444] hover:text-[#888888]'
                 }
               `}
             >
               {value !== 'all' && (
                 <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{
-                    background: value === 'T' ? '#d4a843' : '#4ea8d1',
-                  }}
+                  className="w-1.5 h-1.5 shrink-0"
+                  style={{ background: colorMap[value] }}
                 />
               )}
-              {label}
-            </motion.button>
+              [{label}]
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="flex gap-1 px-3 pt-3 pb-1">
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onFilterChange('tab', 'all')}
-          className={`
-            flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors
-            ${
-              filters.tab === 'all'
-                ? 'bg-[#2a2b36] text-white'
-                : 'text-white/40 hover:text-white/70 hover:bg-[#1e1f2a]'
-            }
-          `}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="12"
-            height="12"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-          </svg>
-          Все
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onFilterChange('tab', 'favorites')}
-          className={`
-            flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors
-            ${
-              filters.tab === 'favorites'
-                ? 'bg-[#2a2b36] text-white'
-                : 'text-white/40 hover:text-white/70 hover:bg-[#1e1f2a]'
-            }
-          `}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="12"
-            height="12"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-          Избранные
-        </motion.button>
-      </div>
-
-      <div className="px-3 pt-3 pb-1">
-        <div className="text-[10px] uppercase tracking-wider text-white/30 font-medium">
-          Лайнапы
+      {/* Side filter */}
+      <div className="px-3 pt-2 pb-1">
+        <div className="text-[10px] text-[#2a2a2a] mb-1.5 font-bold">
+          // СТОРОНА
+        </div>
+        <div className="flex gap-1">
+          {SIDE_FILTERS.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => onFilterChange('side', value)}
+              className={`
+                flex items-center gap-1 px-2 py-1 text-[10px] font-bold tracking-wider transition-colors border
+                ${
+                  filters.side === value
+                    ? 'border-[#2a2a2a] bg-[#1a1a1a] text-[#cccccc]'
+                    : 'border-transparent text-[#444444] hover:text-[#888888]'
+                }
+              `}
+            >
+              {value !== 'all' && (
+                <span
+                  className="w-1.5 h-1.5 shrink-0"
+                  style={{
+                    background: value === 'T' ? '#a89a3a' : '#5a8a9e',
+                  }}
+                />
+              )}
+              [{label}]
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 px-3 pt-3 pb-1">
+        <button
+          onClick={() => onFilterChange('tab', 'all')}
+          className={`
+            px-2 py-1 text-[10px] font-bold tracking-wider transition-colors
+            ${
+              filters.tab === 'all'
+                ? 'text-[#cccccc]'
+                : 'text-[#444444] hover:text-[#888888]'
+            }
+          `}
+        >
+          {'>'} ВСЕ
+        </button>
+        <button
+          onClick={() => onFilterChange('tab', 'favorites')}
+          className={`
+            px-2 py-1 text-[10px] font-bold tracking-wider transition-colors
+            ${
+              filters.tab === 'favorites'
+                ? 'text-[#cccccc]'
+                : 'text-[#444444] hover:text-[#888888]'
+            }
+          `}
+        >
+          {'>'} ИЗБРАННЫЕ
+        </button>
+      </div>
+
+      {/* Section label */}
+      <div className="px-3 pt-3 pb-1">
+        <div className="text-[10px] text-[#2a2a2a] font-bold">
+          // ЛАЙНАПЫ
+        </div>
+      </div>
+
+      {/* Lineup list */}
       <div className="flex-1 overflow-y-auto px-2 pb-2">
         {lineups.length === 0 && filters.tab === 'favorites' && (
-          <div className="text-white/30 text-xs text-center mt-8">
-            Нет избранных лайнапов
+          <div className="text-[#2a2a2a] text-xs text-center mt-8">
+            {'>'} нет избранных лайнапов
           </div>
         )}
         {lineups.length === 0 && filters.tab !== 'favorites' && (
-          <div className="text-white/30 text-xs text-center mt-8">
-            Лайнапы не найдены
+          <div className="text-[#2a2a2a] text-xs text-center mt-8">
+            {'>'} лайнапы не найдены
           </div>
         )}
 
@@ -263,39 +237,34 @@ export default function Sidebar({
               onMouseEnter={() => onHover?.(lineup.id)}
               onMouseLeave={() => onHover?.(null)}
               className={`
-                relative flex items-start gap-2 p-2 rounded-lg cursor-pointer transition-colors mb-0.5
+                relative flex items-start gap-2 p-2 cursor-pointer transition-colors mb-0.5
                 ${
                   isActive
-                    ? 'bg-[#2a2b36]'
+                    ? 'bg-[#1a1a1a] border-l-2'
                     : isHovered
-                    ? 'bg-[#1e1f2a] ring-1 ring-[#4ea8d1]/30'
-                    : 'hover:bg-[#1e1f2a]'
+                    ? 'bg-[#111111] border-l-2'
+                    : 'border-l-2 border-transparent hover:bg-[#111111]'
                 }
               `}
+              style={{
+                borderLeftColor: isActive || isHovered ? colorMap[lineup.type] : 'transparent',
+              }}
             >
-              <span
-                className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r transition-opacity ${
-                  isActive ? 'opacity-100' : 'opacity-0'
-                }`}
-                style={{ background: colorMap[lineup.type] }}
-              />
-
               <div
-                className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 mt-0.5"
+                className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5"
                 style={{
-                  background: `${colorMap[lineup.type]}20`,
                   color: colorMap[lineup.type],
                 }}
                 dangerouslySetInnerHTML={{ __html: typeIcons[lineup.type] }}
               />
 
               <div className="flex-1 min-w-0">
-                <div className="text-white/90 text-xs font-medium truncate">
+                <div className="text-[#cccccc] text-xs font-medium truncate">
                   {lineup.name}
                 </div>
-                <div className="flex items-center gap-1 text-white/35 text-[10px] mt-0.5">
+                <div className="flex items-center gap-1 text-[#2a2a2a] text-[10px] mt-0.5">
                   <span className="truncate">{lineup.from}</span>
-                  <span className="text-white/20">&#x25B8;</span>
+                  <span>→</span>
                   <span className="truncate">{lineup.to}</span>
                 </div>
               </div>
@@ -306,32 +275,22 @@ export default function Sidebar({
                     e.stopPropagation()
                     onToggleFavorite(lineup.id)
                   }}
-                  className={`transition-colors ${
-                    isFav ? 'text-red-400' : 'text-white/20 hover:text-white/40'
+                  className={`transition-colors text-xs ${
+                    isFav ? 'text-[#9e3e2a]' : 'text-[#2a2a2a] hover:text-[#444444]'
                   }`}
                   title="Избранное"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill={isFav ? 'currentColor' : 'none'}
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
+                  {isFav ? '*' : '.'}
                 </button>
                 <span
-                  className={`text-[9px] font-bold px-1 rounded ${
-                    lineup.side === 'T'
-                      ? 'bg-[#d4a843]/20 text-[#d4a843]'
-                      : 'bg-[#4ea8d1]/20 text-[#4ea8d1]'
-                  }`}
+                  className="text-[9px] font-bold px-1"
+                  style={{
+                    color: lineup.side === 'T' ? '#a89a3a' : '#5a8a9e',
+                  }}
                 >
                   {lineup.side}
                 </span>
-                <span className="text-[9px] text-white/25">
+                <span className="text-[9px] text-[#2a2a2a]">
                   {throwShortLabels[lineup.throw_type] ?? lineup.throw_type}
                 </span>
               </div>
@@ -342,15 +301,16 @@ export default function Sidebar({
         {hasMore && (
           <button
             onClick={() => setDisplayCount(prev => prev + PAGE_SIZE)}
-            className="w-full py-2 mt-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white/40 hover:text-white/60 text-xs font-medium transition-colors"
+            className="w-full py-2 mt-1 border border-[#1c1c1c] text-[#444444] hover:text-[#888888] hover:border-[#2a2a2a] text-xs font-bold transition-colors"
           >
-            Показать ещё ({lineups.length - displayCount})
+            [ ещё {lineups.length - displayCount} ]
           </button>
         )}
       </div>
 
-      <div className="px-3 py-2 text-[10px] text-white/25 border-t border-[#2a2b36] shrink-0">
-        {displayCount < count ? `${Math.min(displayCount, count)} из ` : ''}{count} {countLabel}
+      {/* Count */}
+      <div className="px-3 py-2 text-[10px] text-[#2a2a2a] border-t border-[#1c1c1c] shrink-0 font-bold">
+        [ {displayCount < count ? `${Math.min(displayCount, count)} / ` : ''}{count} {countLabel} ]
       </div>
     </aside>
   )

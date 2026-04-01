@@ -9,7 +9,7 @@ import CommentSection from '@/components/comments/CommentSection'
 import type { LineupWithStats } from '@/lib/types/lineup'
 import type { User } from '@supabase/supabase-js'
 
-const SCREENSHOT_LABELS = ['Позиция', 'Прицел', 'Результат']
+const SCREENSHOT_LABELS = ['POS', 'AIM', 'RES']
 
 interface DetailPanelProps {
   lineup: LineupWithStats | null
@@ -71,15 +71,15 @@ export default function DetailPanel({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 bg-[#0d0e14] flex flex-col md:flex-row"
+          className="fixed inset-0 z-50 bg-black flex flex-col md:flex-row"
         >
+          {/* Image area */}
           <div className="relative flex-1 bg-black flex items-center justify-center min-h-[40vh] md:min-h-0">
             <button
               onClick={onClose}
-              className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/50 hover:bg-black/70 text-white/80 text-sm font-medium transition-colors backdrop-blur-sm"
+              className="absolute top-3 left-3 z-10 flex items-center gap-2 px-3 py-1.5 border border-[#1c1c1c] text-[#888888] text-xs font-bold hover:bg-[#1a1a1a] hover:text-[#cccccc] transition-colors"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-              Назад
+              [ ← ESC ]
             </button>
 
             {lineup.video ? (
@@ -109,125 +109,126 @@ export default function DetailPanel({
                 />
               )
             ) : (
-              <div className="text-white/20 text-sm">Нет изображений</div>
+              <div className="text-[#2a2a2a] text-xs">{'>'} нет изображений</div>
             )}
 
             {!lineup.video && total > 1 && (
               <>
-                <div className="absolute top-4 right-4 flex gap-1.5 z-10">
+                <div className="absolute top-3 right-3 flex gap-1 z-10">
                   {screenshots.map((_, i) => (
                     <button
                       key={i}
                       onClick={() => setImgIdx(i)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors backdrop-blur-sm ${
+                      className={`px-3 py-1.5 text-[10px] font-bold border transition-colors ${
                         i === imgIdx
-                          ? 'bg-white text-black'
-                          : 'bg-black/50 text-white/70 hover:bg-black/70'
+                          ? 'border-[#2a2a2a] bg-[#1a1a1a] text-[#cccccc]'
+                          : 'border-[#1c1c1c] text-[#444444] hover:text-[#888888]'
                       }`}
                     >
-                      {SCREENSHOT_LABELS[i] || `${i + 1}`}
+                      [{String(i + 1).padStart(2, '0')} {SCREENSHOT_LABELS[i] || ''}]
                     </button>
                   ))}
                 </div>
                 <button
                   onClick={() => setImgIdx(i => (i - 1 + total) % total)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors z-10"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center border border-[#1c1c1c] text-[#444444] hover:text-[#cccccc] hover:border-[#2a2a2a] transition-colors z-10 text-xs font-bold"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                  {'<'}
                 </button>
                 <button
                   onClick={() => setImgIdx(i => (i + 1) % total)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors z-10"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center border border-[#1c1c1c] text-[#444444] hover:text-[#cccccc] hover:border-[#2a2a2a] transition-colors z-10 text-xs font-bold"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                  {'>'}
                 </button>
               </>
             )}
           </div>
 
-          <div className="w-full md:w-[340px] lg:w-[380px] bg-[#1a1b26] border-l border-[#2a2b36] overflow-y-auto shrink-0">
-            <div className="px-5 pt-5 pb-4" style={{ background: `linear-gradient(135deg, ${color}12 0%, transparent 60%)` }}>
+          {/* Info panel */}
+          <div className="w-full md:w-[340px] lg:w-[380px] bg-[#0a0a0a] border-l border-[#1c1c1c] overflow-y-auto shrink-0">
+            <div className="px-5 pt-5 pb-4">
               <div className="flex flex-wrap gap-1.5 mb-3">
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded" style={{ background: `${color}25`, color }}>
-                  {typeLabels[lineup.type]}
+                <span className="text-[10px] font-bold px-2 py-0.5 border" style={{ borderColor: `${color}40`, color }}>
+                  [{typeLabels[lineup.type].toUpperCase()}]
                 </span>
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${lineup.side === 'T' ? 'bg-[#d4a843]/20 text-[#d4a843]' : 'bg-[#4ea8d1]/20 text-[#4ea8d1]'}`}>
-                  {lineup.side === 'T' ? 'Атака' : 'Защита'}
+                <span className={`text-[10px] font-bold px-2 py-0.5 border ${lineup.side === 'T' ? 'border-[#a89a3a]/40 text-[#a89a3a]' : 'border-[#5a8a9e]/40 text-[#5a8a9e]'}`}>
+                  [{lineup.side === 'T' ? 'АТАКА' : 'ЗАЩИТА'}]
                 </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-white/[0.06] text-white/50">
-                  {mapLabels[lineup.map]}
+                <span className="text-[10px] font-bold px-2 py-0.5 border border-[#1c1c1c] text-[#444444]">
+                  [{mapLabels[lineup.map].toUpperCase()}]
                 </span>
               </div>
-              <h2 className="text-white text-lg font-semibold leading-tight">{lineup.name}</h2>
+              <h2 className="text-[#cccccc] text-base font-bold leading-tight crt-glow" style={{ textShadow: `0 0 8px ${color}50` }}>
+                {lineup.name}
+              </h2>
             </div>
 
             <div className="px-5 pb-6 space-y-4">
+              {/* Action buttons */}
               <div className="flex gap-2">
                 <button
                   onClick={onToggleFavorite}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    isFavorite ? 'bg-red-500/15 text-red-400' : 'bg-white/[0.06] text-white/50 hover:text-white/70'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold border transition-colors ${
+                    isFavorite ? 'border-[#9e3e2a]/40 text-[#9e3e2a]' : 'border-[#1c1c1c] text-[#444444] hover:text-[#888888]'
                   }`}
                 >
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
-                  {isFavorite ? 'В избранном' : 'В избранное'}
+                  [ {isFavorite ? '* FAV' : 'FAV'} ]
                 </button>
-                <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.06] text-white/50 hover:text-white/70 transition-colors">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                  </svg>
-                  Ссылка
+                <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold border border-[#1c1c1c] text-[#444444] hover:text-[#888888] transition-colors">
+                  [ LINK ]
                 </button>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-white/[0.06]">
-                  <span className="text-xs text-white/40">Сторона</span>
-                  <span className={`text-sm font-semibold ${lineup.side === 'T' ? 'text-[#d4a843]' : 'text-[#4ea8d1]'}`}>
+              {/* Properties table */}
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between py-1.5 border-b border-[#1c1c1c]">
+                  <span className="text-[#444444]">СТОРОНА</span>
+                  <span className={`font-bold ${lineup.side === 'T' ? 'text-[#a89a3a]' : 'text-[#5a8a9e]'}`}>
                     {lineup.side === 'T' ? 'Террорист' : 'Спецназ'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between py-2 border-b border-white/[0.06]">
-                  <span className="text-xs text-white/40">Бросок</span>
-                  <span className="text-sm font-semibold text-white/80">{throwLabels[lineup.throw_type]}</span>
+                <div className="flex items-center justify-between py-1.5 border-b border-[#1c1c1c]">
+                  <span className="text-[#444444]">БРОСОК</span>
+                  <span className="font-bold text-[#888888]">{throwLabels[lineup.throw_type]}</span>
                 </div>
-                <div className="flex items-center justify-between py-2 border-b border-white/[0.06]">
-                  <span className="text-xs text-white/40">Сложность</span>
-                  <span className="text-sm font-semibold" style={{ color: diff.color }}>{diff.label}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3">
-                <div className="flex-1">
-                  <div className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Откуда</div>
-                  <div className="text-white/80 text-sm font-medium">{lineup.from}</div>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/20 shrink-0">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-                <div className="flex-1 text-right">
-                  <div className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Куда</div>
-                  <div className="text-white/80 text-sm font-medium">{lineup.to}</div>
+                <div className="flex items-center justify-between py-1.5 border-b border-[#1c1c1c]">
+                  <span className="text-[#444444]">СЛОЖНОСТЬ</span>
+                  <span className="font-bold" style={{ color: diff.color }}>{diff.label}</span>
                 </div>
               </div>
 
+              {/* From → To */}
+              <div className="border border-[#1c1c1c] p-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="text-[10px] text-[#2a2a2a] font-bold mb-0.5">FROM:</div>
+                    <div className="text-[#888888] font-bold">{lineup.from}</div>
+                  </div>
+                  <span className="text-[#2a2a2a] font-bold">→</span>
+                  <div className="flex-1 text-right">
+                    <div className="text-[10px] text-[#2a2a2a] font-bold mb-0.5">TO:</div>
+                    <div className="text-[#888888] font-bold">{lineup.to}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
               {lineup.description && (
                 <div>
-                  <div className="text-xs text-white/40 mb-1.5">Инструкция</div>
-                  <p className="text-white/60 text-sm leading-relaxed rounded-lg p-3" style={{ background: `${color}08` }}>
-                    {lineup.description}
+                  <div className="text-[10px] text-[#2a2a2a] font-bold mb-1.5">// ИНСТРУКЦИЯ</div>
+                  <p className="text-[#444444] text-xs leading-relaxed border-l-2 pl-3 py-2" style={{ borderColor: `${color}40` }}>
+                    {'>'} {lineup.description}
                   </p>
                 </div>
               )}
 
               <CommentSection lineupId={lineup.id} user={user} accessToken={accessToken} />
 
-              <div className="text-[10px] text-white/20 pt-2 flex gap-3">
-                <span><kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] text-white/30">Esc</kbd> закрыть</span>
-                {total > 1 && <span><kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] text-white/30">&larr; &rarr;</kbd> листать</span>}
+              {/* Hotkeys */}
+              <div className="text-[10px] text-[#2a2a2a] pt-2 flex gap-3 font-bold">
+                <span><kbd className="px-1.5 py-0.5 border border-[#1c1c1c] text-[#444444]">Esc</kbd> закрыть</span>
+                {total > 1 && <span><kbd className="px-1.5 py-0.5 border border-[#1c1c1c] text-[#444444]">← →</kbd> листать</span>}
               </div>
             </div>
           </div>

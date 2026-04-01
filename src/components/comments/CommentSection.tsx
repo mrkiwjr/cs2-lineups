@@ -141,40 +141,34 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/40">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-        <h3 className="text-sm font-medium text-white/60">
-          Комментарии{comments.length > 0 && ` (${comments.length})`}
-        </h3>
-      </div>
+      <h3 className="text-[10px] font-bold text-[#2a2a2a]">
+        // КОММЕНТАРИИ{comments.length > 0 && ` (${comments.length})`}
+      </h3>
 
       {error && (
-        <div className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">
-          {error}
+        <div className="text-[10px] text-[#9e3e2a] border border-[#9e3e2a]/20 px-3 py-2 font-bold">
+          {'>'} {error}
         </div>
       )}
 
       {loading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[1, 2].map((i) => (
             <div key={i} className="flex gap-3 animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-[#2a2b36]" />
+              <div className="w-6 h-6 bg-[#1c1c1c]" />
               <div className="flex-1 space-y-2">
-                <div className="h-3 w-24 bg-[#2a2b36] rounded" />
-                <div className="h-3 w-full bg-[#2a2b36] rounded" />
+                <div className="h-2 w-20 bg-[#1c1c1c]" />
+                <div className="h-2 w-full bg-[#1c1c1c]" />
               </div>
             </div>
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-6">
-          <p className="text-sm text-white/20">Нет комментариев</p>
-          <p className="text-xs text-white/10 mt-1">Будьте первым!</p>
+        <div className="py-4">
+          <p className="text-xs text-[#2a2a2a] font-bold">{'>'} нет комментариев. будьте первым.<span className="animate-[blink-cursor_0.8s_infinite]">_</span></p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {comments.map((comment) => (
             <CommentItem
               key={comment.id}
@@ -187,37 +181,40 @@ export default function CommentSection({ lineupId, user, accessToken }: CommentS
         </div>
       )}
 
-      <div className="border-t border-[#2a2b36]" />
+      <div className="border-t border-[#1c1c1c]" />
 
       {user ? (
         <div className="space-y-2">
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Добавить комментарий..."
-            maxLength={2000}
-            rows={3}
-            className="w-full bg-[#13141f] border border-[#2a2b36] rounded-lg px-3 py-2 text-sm text-[#c0c4d6] placeholder-white/20 resize-none focus:outline-none focus:border-[#3b7fc4] transition-colors"
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-2.5 text-[#2a2a2a] text-xs font-bold">{'>'}</span>
+            <textarea
+              ref={textareaRef}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="комментарий..."
+              maxLength={2000}
+              rows={3}
+              className="w-full bg-black border border-[#1c1c1c] pl-6 pr-3 py-2 text-xs text-[#888888] placeholder-[#2a2a2a] resize-none focus:outline-none focus:border-[#2a2a2a] transition-colors"
+            />
+          </div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-white/20">
-              {text.length}/2000 &middot; Ctrl+Enter для отправки
+            <span className="text-[10px] text-[#2a2a2a] font-bold">
+              {text.length}/2000 // Ctrl+Enter
             </span>
             <button
               onClick={handleSubmit}
               disabled={!text.trim() || text.trim().length > 2000 || submitting}
-              className="px-4 py-1.5 text-xs font-medium rounded-lg bg-[#3b7fc4] text-white hover:bg-[#4a8fd4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1 text-[10px] font-bold border border-[#2a2a2a] text-[#888888] hover:text-[#cccccc] hover:bg-[#1a1a1a] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              {submitting ? 'Отправка...' : 'Отправить'}
+              [ {submitting ? 'ОТПРАВКА...' : 'ОТПРАВИТЬ'} ]
             </button>
           </div>
         </div>
       ) : (
-        <div className="text-center py-4 bg-white/[0.02] rounded-lg border border-[#2a2b36]">
-          <p className="text-sm text-white/30">
-            Войдите, чтобы комментировать
+        <div className="py-3 border border-[#1c1c1c] text-center">
+          <p className="text-xs text-[#2a2a2a] font-bold">
+            {'>'} войдите, чтобы комментировать
           </p>
         </div>
       )}
